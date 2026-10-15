@@ -38,9 +38,19 @@ jobs:
         ports: ["3306:3306"]
         options: >-
           --health-cmd "mysqladmin ping -h 127.0.0.1 -plasiusman" --health-interval 5s --health-timeout 5s --health-retries 20
+      mssql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          MSSQL_SA_PASSWORD: LasiusMan_Pass1
+        ports: ["1433:1433"]
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P LasiusMan_Pass1 -Q 'SELECT 1' || exit 1"
+          --health-interval 5s --health-timeout 5s --health-retries 30
     env:
       LASIUSMAN_TEST_POSTGRES: postgres://postgres:lasiusman@127.0.0.1:5432/postgres
       LASIUSMAN_TEST_MYSQL: mysql://root:lasiusman@127.0.0.1:3306/lasiusman_test
+      LASIUSMAN_TEST_MSSQL: mssql://sa:LasiusMan_Pass1@127.0.0.1:1433/lasiusman_test
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
