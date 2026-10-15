@@ -5,8 +5,10 @@
 //! added by implementing [`Connection`] in `lasiusman-drivers` (or any other crate).
 
 mod config;
+pub mod dml;
 mod driver;
 mod error;
+pub mod export;
 mod result;
 mod schema;
 pub mod sql;
