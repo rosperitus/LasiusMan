@@ -32,7 +32,7 @@ pub struct LasiusManApp {
     prompt: Option<Prompt>,
     status: String,
     // Keeps the runtime alive for the lifetime of the window.
-    _runtime: tokio::runtime::Runtime,
+    runtime: Option<tokio::runtime::Runtime>,
 }
 
 impl LasiusManApp {
@@ -56,7 +56,7 @@ impl LasiusManApp {
             confirm_delete: None,
             prompt: None,
             status: "Ready".into(),
-            _runtime: runtime,
+            runtime: Some(runtime),
         }
     }
 
@@ -651,6 +651,15 @@ impl LasiusManApp {
                 Some(false) => self.confirm_delete = None,
                 None => {}
             }
+        }
+    }
+}
+
+impl Drop for LasiusManApp {
+    fn drop(&mut self) {
+        // Closing the window must not wait for a query that is still running.
+        if let Some(rt) = self.runtime.take() {
+            rt.shutdown_background();
         }
     }
 }
