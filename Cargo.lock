@@ -1227,6 +1227,7 @@ dependencies = [
  "lasiusman-core",
  "lasiusman-drivers",
  "directories",
+ "duckdb",
  "eframe",
  "egui",
  "egui_kittest",

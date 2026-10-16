@@ -63,6 +63,12 @@ pub enum JobSpec {
         statements: Vec<String>,
         transaction: bool,
     },
+    /// Tables with their rows copied from one connection to another.
+    Copy {
+        source: Box<lasiusman_core::ConnectionConfig>,
+        target: Box<lasiusman_core::ConnectionConfig>,
+        job: lasiusman_drivers::copy::CopyJob,
+    },
     /// Backup or restore statements run on a session of a DuckDB file.
     DuckDb {
         db: String,
@@ -93,6 +99,9 @@ impl JobSpec {
             JobSpec::Import { cfg, job } => lasiusman_drivers::transfer::import(*cfg, job, report, cancel).await,
             JobSpec::Script { cfg, database, statements, transaction } => {
                 lasiusman_drivers::compare::run_script(*cfg, database, statements, transaction, report, cancel).await
+            }
+            JobSpec::Copy { source, target, job } => {
+                lasiusman_drivers::copy::copy(*source, *target, job, report, cancel).await
             }
         }
     }
