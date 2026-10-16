@@ -5,6 +5,7 @@
 //! added by implementing [`Connection`] in `lasiusman-drivers` (or any other crate).
 
 pub mod backup;
+pub mod compare;
 mod config;
 pub mod ddl;
 pub mod dml;
