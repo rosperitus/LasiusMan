@@ -1224,6 +1224,7 @@ dependencies = [
 name = "lasiusman"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "lasiusman-core",
  "lasiusman-drivers",
  "directories",
