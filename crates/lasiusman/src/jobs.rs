@@ -70,6 +70,11 @@ pub enum JobSpec {
         target: Box<lasiusman_core::ConnectionConfig>,
         job: lasiusman_drivers::copy::CopyJob,
     },
+    /// Generated rows inserted into a table.
+    Generate {
+        cfg: Box<lasiusman_core::ConnectionConfig>,
+        job: lasiusman_drivers::generate::GenerateJob,
+    },
     /// Backup or restore statements run on a session of a DuckDB file.
     DuckDb {
         db: String,
@@ -101,6 +106,7 @@ impl JobSpec {
             JobSpec::Script { cfg, database, statements, transaction } => {
                 lasiusman_drivers::compare::run_script(*cfg, database, statements, transaction, report, cancel).await
             }
+            JobSpec::Generate { cfg, job } => lasiusman_drivers::generate::generate(*cfg, job, report, cancel).await,
             JobSpec::Copy { source, target, job } => {
                 lasiusman_drivers::copy::copy(*source, *target, job, report, cancel).await
             }
