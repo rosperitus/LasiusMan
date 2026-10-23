@@ -63,4 +63,11 @@ impl Connection for ReadOnly {
     async fn cancel(&self) -> DbResult<()> {
         self.inner.cancel().await
     }
+
+    async fn command(&self, database: Option<&str>, args: &[String]) -> DbResult<lasiusman_core::redis::Reply> {
+        if !lasiusman_core::redis::is_read_only(args) {
+            return Err(refused());
+        }
+        self.inner.command(database, args).await
+    }
 }

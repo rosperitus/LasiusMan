@@ -47,6 +47,11 @@ jobs:
         options: >-
           --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P LasiusMan_Pass1 -Q 'SELECT 1' || exit 1"
           --health-interval 5s --health-timeout 5s --health-retries 30
+      redis:
+        image: redis:7
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 10
     env:
       LASIUSMAN_TEST_POSTGRES: postgres://postgres:lasiusman@127.0.0.1:5432/postgres
       LASIUSMAN_TEST_MYSQL: mysql://root:lasiusman@127.0.0.1:3306/lasiusman_test
@@ -54,6 +59,7 @@ jobs:
       LASIUSMAN_TEST_CLICKHOUSE: clickhouse://default:lasiusman@127.0.0.1:8123/lasiusman_test
       LASIUSMAN_TEST_COCKROACH: postgres://root@127.0.0.1:26257/lasiusman_test
       LASIUSMAN_TEST_TIDB: mysql://root@127.0.0.1:4000/lasiusman_test
+      LASIUSMAN_TEST_REDIS: redis://127.0.0.1:6379
     steps:
       - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
