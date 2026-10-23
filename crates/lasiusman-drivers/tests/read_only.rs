@@ -1,7 +1,8 @@
 //! Read-only connections: reads work, changes are refused, and on PostgreSQL
 //! even a SELECT that writes through a function fails. SQLite and DuckDB
-//! always run; PostgreSQL and MySQL need `LASIUSMAN_TEST_POSTGRES` and
-//! `LASIUSMAN_TEST_MYSQL`, and are skipped with a note otherwise.
+//! always run; PostgreSQL, MySQL, CockroachDB and TiDB need
+//! `LASIUSMAN_TEST_POSTGRES`, `LASIUSMAN_TEST_MYSQL`, `LASIUSMAN_TEST_COCKROACH` and
+//! `LASIUSMAN_TEST_TIDB`, and are skipped with a note otherwise.
 
 use lasiusman_core::{ConnectionConfig, DbKind, StatementOutcome};
 
@@ -91,5 +92,25 @@ async fn mysql() {
         eprintln!("LASIUSMAN_TEST_MYSQL not set, skipping");
         return;
     };
+    check(cfg).await;
+}
+
+#[tokio::test]
+async fn cockroach() {
+    let Some(mut cfg) = from_url(DbKind::Postgres, "LASIUSMAN_TEST_COCKROACH") else {
+        eprintln!("LASIUSMAN_TEST_COCKROACH not set, skipping");
+        return;
+    };
+    cfg.product = lasiusman_core::Product::CockroachDb;
+    check(cfg).await;
+}
+
+#[tokio::test]
+async fn tidb() {
+    let Some(mut cfg) = from_url(DbKind::MySql, "LASIUSMAN_TEST_TIDB") else {
+        eprintln!("LASIUSMAN_TEST_TIDB not set, skipping");
+        return;
+    };
+    cfg.product = lasiusman_core::Product::TiDb;
     check(cfg).await;
 }

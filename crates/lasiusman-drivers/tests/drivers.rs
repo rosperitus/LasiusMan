@@ -2,7 +2,8 @@
 //!
 //! SQLite always runs. PostgreSQL and MySQL run when their URL is set, e.g.
 //! `LASIUSMAN_TEST_POSTGRES=postgres://postgres:secret@127.0.0.1:5432/postgres` and
-//! `LASIUSMAN_TEST_MYSQL=mysql://root:secret@127.0.0.1:3306/lasiusman_test`.
+//! `LASIUSMAN_TEST_MYSQL=mysql://root:secret@127.0.0.1:3306/lasiusman_test`. Products on
+//! their protocols run the same way, with `LASIUSMAN_TEST_COCKROACH` and `LASIUSMAN_TEST_TIDB`.
 
 use std::sync::Arc;
 
@@ -377,6 +378,77 @@ async fn mysql() {
     let blob = rows(&c, &db, "SELECT CAST('ab' AS BINARY) AS b, 'x' AS t").await;
     assert_eq!(blob[0][0], Cell::Bytes(b"ab".to_vec()));
     assert_eq!(blob[0][1], Cell::Text("x".into()));
+    check_cancel(c, &db, "SELECT SLEEP(30)").await;
+}
+
+#[tokio::test]
+async fn cockroach() {
+    let Some(mut cfg) = from_url(DbKind::Postgres, "LASIUSMAN_TEST_COCKROACH") else {
+        eprintln!("LASIUSMAN_TEST_COCKROACH not set, skipping");
+        return;
+    };
+    cfg.product = lasiusman_core::Product::CockroachDb;
+    let db = cfg.database.clone();
+    let c = lasiusman_drivers::connect(&cfg).await.unwrap();
+    assert!(c.server_version().await.unwrap().contains("CockroachDB"));
+    check_engine(
+        c.clone(),
+        &db,
+        "lasiusman_test",
+        &[
+            "DROP SCHEMA IF EXISTS lasiusman_test CASCADE",
+            "CREATE SCHEMA lasiusman_test",
+            "CREATE TABLE lasiusman_test.items (id int PRIMARY KEY, name varchar(50) NOT NULL, parent int REFERENCES lasiusman_test.items(id))",
+            "CREATE INDEX items_name_idx ON lasiusman_test.items(name)",
+            "CREATE VIEW lasiusman_test.item_names AS SELECT name FROM lasiusman_test.items",
+            "CREATE FUNCTION lasiusman_test.add(a int, b int) RETURNS int LANGUAGE sql AS $$ SELECT a + b; $$",
+            "CREATE TYPE lasiusman_test.mood AS ENUM ('ok', 'sad')",
+            "CREATE SEQUENCE lasiusman_test.counter START 5",
+        ],
+    )
+    .await;
+    let objects = c.objects(&db, "lasiusman_test").await.unwrap();
+    for o in &objects {
+        let ddl = c.ddl(o).await.unwrap_or_else(|e| panic!("ddl of {:?}: {e}", o.path));
+        assert!(ddl.contains("CREATE"), "{ddl}");
+    }
+    assert!(objects.iter().any(|o| o.kind == ObjectKind::Function && o.path.name == "add"));
+    assert!(objects.iter().any(|o| o.kind == ObjectKind::Type && o.path.name == "mood"));
+    assert!(objects.iter().any(|o| o.kind == ObjectKind::Sequence && o.path.name == "counter"));
+    check_ddl(c.clone(), &db, "lasiusman_test").await;
+    exec(&c, &db, "DROP SCHEMA lasiusman_test CASCADE").await;
+    check_cancel(c, &db, "SELECT pg_sleep(30)").await;
+}
+
+#[tokio::test]
+async fn tidb() {
+    let Some(mut cfg) = from_url(DbKind::MySql, "LASIUSMAN_TEST_TIDB") else {
+        eprintln!("LASIUSMAN_TEST_TIDB not set, skipping");
+        return;
+    };
+    cfg.product = lasiusman_core::Product::TiDb;
+    let db = cfg.database.clone();
+    let c = lasiusman_drivers::connect(&cfg).await.unwrap();
+    assert!(c.server_version().await.unwrap().contains("TiDB"));
+    check_engine(
+        c.clone(),
+        &db,
+        &db,
+        &[
+            "DROP VIEW IF EXISTS item_names",
+            "DROP TABLE IF EXISTS items",
+            "CREATE TABLE items (id int PRIMARY KEY, name varchar(50) NOT NULL, parent int, \
+             CONSTRAINT items_parent_fk FOREIGN KEY (parent) REFERENCES items(id))",
+            "CREATE INDEX items_name_idx ON items(name)",
+            "CREATE VIEW item_names AS SELECT name FROM items",
+        ],
+    )
+    .await;
+    for o in &c.objects(&db, &db).await.unwrap() {
+        let ddl = c.ddl(o).await.unwrap_or_else(|e| panic!("ddl of {:?}: {e}", o.path));
+        assert!(ddl.contains("CREATE"), "{ddl}");
+    }
+    check_ddl(c.clone(), &db, &db).await;
     check_cancel(c, &db, "SELECT SLEEP(30)").await;
 }
 

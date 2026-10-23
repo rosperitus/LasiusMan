@@ -6,7 +6,7 @@
 
 use std::sync::Arc;
 
-use lasiusman_core::{Connection, ConnectionConfig, DbKind, DbResult};
+use lasiusman_core::{Connection, ConnectionConfig, DbKind, DbResult, Product};
 
 pub mod backup;
 pub mod clickhouse;
@@ -52,12 +52,13 @@ pub async fn explain(
     conn: &Arc<dyn Connection>,
     database: Option<&str>,
     kind: DbKind,
+    product: Product,
     sql: &str,
     analyze: bool,
 ) -> DbResult<lasiusman_core::explain::Plan> {
     let mut plan = None;
     let mut failed = None;
-    let stmts = lasiusman_core::explain::statements(kind, sql, analyze);
+    let stmts = lasiusman_core::explain::statements(kind, product, sql, analyze);
     let last = stmts.len() - 1;
     for (i, s) in stmts.iter().enumerate() {
         // After an error only the last statement runs: it switches SQL Server's SHOWPLAN off again.
@@ -76,5 +77,5 @@ pub async fn explain(
         return Err(e);
     }
     let r = plan.ok_or_else(|| lasiusman_core::DbError::new("The server returned no plan."))?;
-    lasiusman_core::explain::parse(kind, &r).map_err(lasiusman_core::DbError::new)
+    lasiusman_core::explain::parse(kind, product, &r).map_err(lasiusman_core::DbError::new)
 }
