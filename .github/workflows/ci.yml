@@ -21,8 +21,8 @@ jobs:
       - run: cargo clippy --workspace --all-targets -- -D warnings
 
   test:
-    # ubuntu-latest moved to Ubuntu 26.04 in October 2026, where the mongo:8
-    # service container fails to start; 24.04 is the proven image for now.
+    # Pinned rather than ubuntu-latest: the floating label moves underneath
+    # the test job's service containers every year or so.
     runs-on: ubuntu-24.04
     services:
       postgres:
@@ -54,15 +54,6 @@ jobs:
         ports: ["6379:6379"]
         options: >-
           --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 10
-      mongodb:
-        # Pulled from the AWS mirror of the official image: anonymous Docker
-        # Hub pulls on hosted runners hit rate limits, which surfaced as
-        # "Failed to initialize container mongo:8".
-        image: public.ecr.aws/docker/library/mongo:8
-        ports: ["27017:27017"]
-        options: >-
-          --health-cmd "mongosh --quiet --eval 'db.runCommand({ping: 1})'" --health-interval 5s --health-timeout 5s
-          --health-retries 20
     env:
       LASIUSMAN_TEST_POSTGRES: postgres://postgres:lasiusman@127.0.0.1:5432/postgres
       LASIUSMAN_TEST_MYSQL: mysql://root:lasiusman@127.0.0.1:3306/lasiusman_test
@@ -76,6 +67,18 @@ jobs:
       - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
+      # Started here rather than as a service: the service container failed to
+      # initialize on hosted runners ("Failed to initialize container mongo:8"),
+      # and a step keeps its logs visible on failure.
+      - name: Start MongoDB
+        run: |
+          docker run -d --name mongo -p 27017:27017 public.ecr.aws/docker/library/mongo:8
+          for i in $(seq 60); do
+            docker exec mongo mongosh --quiet --eval 'db.runCommand({ping: 1})' > /dev/null 2>&1 && exit 0
+            sleep 1
+          done
+          docker logs mongo
+          exit 1
       # Started here rather than as a service: it needs the backups disk config from the repository.
       - name: Start ClickHouse
         run: |
