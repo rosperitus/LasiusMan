@@ -173,8 +173,10 @@ fn new_table_job(table: &ObjectPath, path: &Path, kind: DbKind) -> ImportJob {
         .map(|(n, g)| (n.clone(), lasiusman_core::copy::render(kind, g, false)))
         .collect();
     let def = infer::table_def(table.clone(), &columns);
-    let details =
-        lasiusman_core::TableDetails { columns: def.columns.iter().map(|c| c.col.clone()).collect(), ..Default::default() };
+    let details = lasiusman_core::TableDetails {
+        columns: def.columns.iter().map(|c| c.col.clone()).collect(),
+        ..Default::default()
+    };
     ImportJob {
         create: lasiusman_core::ddl::create_table(kind, &def).statements,
         clear_first: false,
@@ -302,8 +304,10 @@ async fn round_trip(cfg: ConnectionConfig, db: &str, schema: &str, create: &str)
     let mut def =
         lasiusman_core::infer::table_def(fresh.clone(), &[("id".into(), int), ("name".into(), "varchar(20)".into())]);
     def.columns[0].col.nullable = false;
-    let new_details =
-        lasiusman_core::TableDetails { columns: def.columns.iter().map(|c| c.col.clone()).collect(), ..Default::default() };
+    let new_details = lasiusman_core::TableDetails {
+        columns: def.columns.iter().map(|c| c.col.clone()).collect(),
+        ..Default::default()
+    };
     let job = ImportJob {
         create: lasiusman_core::ddl::create_table(kind, &def).statements,
         clear_first: false,

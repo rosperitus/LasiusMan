@@ -14,12 +14,12 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock, Weak};
 
 use async_trait::async_trait;
+use duckdb::types::{TimeUnit, Value};
 use lasiusman_core::sql::Dialect;
 use lasiusman_core::{
     Cell, ColumnInfo, ColumnMeta, Connection, ConnectionConfig, DbError, DbKind, DbObject, DbResult, ForeignKeyInfo,
     IndexInfo, ObjectKind, ObjectPath, QueryResult, StatementOutcome, TableDetails,
 };
-use duckdb::types::{TimeUnit, Value};
 
 type Root = Arc<Mutex<duckdb::Connection>>;
 

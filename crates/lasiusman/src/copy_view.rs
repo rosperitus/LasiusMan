@@ -5,10 +5,10 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
+use egui::{RichText, Ui};
 use lasiusman_core::copy::target_def;
 use lasiusman_core::{ConnectionConfig, DbKind, DbResult, ObjectKind, ObjectPath, TableDetails};
 use lasiusman_drivers::copy::{CopyJob, Existing};
-use egui::{RichText, Ui};
 use shadcn_egui::{Badge, Button, ButtonSize, Checkbox, Empty, Select, Theme, alert_dialog};
 use tokio::sync::OnceCell;
 
@@ -173,9 +173,10 @@ impl CopyView {
         let (session, cfg, tx) = (self.source.clone(), self.source_cfg(), cx.tasks.sender());
         let path = ObjectPath::new(&self.database, &self.schema, &name);
         cx.tasks.runtime().spawn(async move {
-            let r =
-                async { session.get_or_try_init(|| lasiusman_drivers::connect(&cfg)).await?.table_details(&path).await }
-                    .await;
+            let r = async {
+                session.get_or_try_init(|| lasiusman_drivers::connect(&cfg)).await?.table_details(&path).await
+            }
+            .await;
             Self::send(&tx, tab, CopyEvent::Details(name, r));
         });
     }

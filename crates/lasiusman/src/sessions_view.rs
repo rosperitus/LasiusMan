@@ -3,9 +3,9 @@
 
 use std::time::{Duration, Instant};
 
+use egui::{RichText, Ui};
 use lasiusman_core::sessions::{self, Session};
 use lasiusman_core::{DbKind, DbResult, Product, StatementOutcome};
-use egui::{RichText, Ui};
 use shadcn_egui::{Column, DataTable, Switch, Theme, alert_dialog, menu_item, menu_separator, toast, toast_error};
 
 use crate::events::{Event, TabEvent, TabId};

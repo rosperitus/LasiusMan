@@ -5,9 +5,9 @@
 
 use std::sync::Arc;
 
+use egui::{Context, RichText, Ui};
 use lasiusman_core::admin::{self, Edit, Grant, Membership, Principal, Scope, Target};
 use lasiusman_core::{Connection, ConnectionConfig, DbKind, DbObject, DbResult, ObjectKind, StatementOutcome};
-use egui::{Context, RichText, Ui};
 use shadcn_egui::{
     Alert, Badge, Button, Checkbox, Column, DataTable, Dialog, Input, Select, Switch, Theme, footer, label, menu_item,
     toast,
@@ -989,7 +989,11 @@ fn display_name(p: &Principal) -> String {
 }
 
 /// Runs alternative statements until one works.
-async fn first_working(s: &Arc<dyn Connection>, db: Option<&str>, list: &[&str]) -> DbResult<lasiusman_core::QueryResult> {
+async fn first_working(
+    s: &Arc<dyn Connection>,
+    db: Option<&str>,
+    list: &[&str],
+) -> DbResult<lasiusman_core::QueryResult> {
     let mut last = None;
     for sql in list {
         match s.execute(db, sql, 100_000).await {

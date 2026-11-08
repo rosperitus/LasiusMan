@@ -7,12 +7,12 @@ use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
+use egui::{Color32, Key, RichText, Sense, Ui};
 use lasiusman_core::sql::Dialect;
 use lasiusman_core::{
     Cell, Connection, ConnectionConfig, DbKind, DbObject, ObjectKind, QueryResult, StatementOutcome, TableDetails, dml,
     paste,
 };
-use egui::{Color32, Key, RichText, Sense, Ui};
 use shadcn_egui::{
     Alert, Button, ButtonSize, Column, DataTable, Dialog, Input, Theme, TooltipExt, menu_item, menu_separator, toast,
 };

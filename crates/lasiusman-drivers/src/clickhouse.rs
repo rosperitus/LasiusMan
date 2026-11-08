@@ -9,12 +9,12 @@
 use std::time::Duration;
 
 use async_trait::async_trait;
+use futures_util::StreamExt;
 use lasiusman_core::sql::{Dialect, TokenKind};
 use lasiusman_core::{
     Cell, ColumnInfo, ColumnMeta, Connection, ConnectionConfig, DbError, DbKind, DbObject, DbResult, IndexInfo,
     ObjectKind, ObjectPath, QueryResult, SslMode, StatementOutcome, TableDetails,
 };
-use futures_util::StreamExt;
 use serde_json::Value;
 
 pub struct ClickHouseConnection {

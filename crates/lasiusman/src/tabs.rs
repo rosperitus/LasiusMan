@@ -5,10 +5,10 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 
+use egui::{Key, Modifiers, RichText, Ui};
 use lasiusman_core::sql::{self, split_statements, statement_at};
 use lasiusman_core::{Connection, ConnectionConfig, DbKind, DbObject, Product, StatementOutcome, TableDetails};
 use lasiusman_drivers::transfer::ExportSource;
-use egui::{Key, Modifiers, RichText, Ui};
 use shadcn_egui::{
     Alert, Badge, Button, ButtonSize, Column, DataTable, Select, Theme, TooltipExt, dropdown_menu, menu_item,
     menu_label, menu_separator, tabs, toast, toast_error, toggle_group,
@@ -852,7 +852,8 @@ impl Console {
         {
             cfg.database = db.clone();
         }
-        tasks.spawn(async move { Event::Tab { tab, event: TabEvent::Session(lasiusman_drivers::connect(&cfg).await) } });
+        tasks
+            .spawn(async move { Event::Tab { tab, event: TabEvent::Session(lasiusman_drivers::connect(&cfg).await) } });
     }
 
     fn ui(&mut self, ui: &mut Ui, tab: TabId, mut cx: TabCtx<'_>) {

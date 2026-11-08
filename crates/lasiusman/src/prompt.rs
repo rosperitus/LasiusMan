@@ -1,8 +1,8 @@
 //! Small confirm-and-run dialogs: create or drop databases and schemas, drop,
 //! rename or truncate objects. Each shows the exact SQL before running it.
 
-use lasiusman_core::{DbKind, DbObject, ObjectKind, ddl};
 use egui::{Context, RichText};
+use lasiusman_core::{DbKind, DbObject, ObjectKind, ddl};
 use shadcn_egui::{Alert, Button, Checkbox, Dialog, Input, Theme, footer, label};
 use uuid::Uuid;
 

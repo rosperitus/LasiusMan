@@ -4,10 +4,10 @@
 
 use std::sync::Arc;
 
+use egui::{RichText, Ui};
 use lasiusman_core::redis::{self as core_redis, KeyNode};
 use lasiusman_core::{Connection, DbResult};
 use lasiusman_drivers::redis::{self, KeyInfo, KeyValue, Scan};
-use egui::{RichText, Ui};
 use shadcn_egui::{Badge, Button, ButtonSize, Column, DataTable, Input, Resizable, Theme, Tree, TreeUi, alert_dialog};
 
 use crate::events::{Event, TabEvent, TabId};
@@ -356,8 +356,11 @@ impl KeysView {
             }
             KeyValue::Bytes(b) => {
                 ui.label(
-                    RichText::new(trf("Binary value, {size}.", &[("size", &lasiusman_core::value::size_label(b.len()))]))
-                        .color(t.muted_foreground),
+                    RichText::new(trf(
+                        "Binary value, {size}.",
+                        &[("size", &lasiusman_core::value::size_label(b.len()))],
+                    ))
+                    .color(t.muted_foreground),
                 );
                 let full = lasiusman_core::value::hex_dump(b, HEX);
                 let mut view = full.as_str();

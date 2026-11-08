@@ -8,13 +8,13 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use async_trait::async_trait;
+use futures_util::TryStreamExt;
 use lasiusman_core::ddl::{self, TableDef};
 use lasiusman_core::sql::Dialect;
 use lasiusman_core::{
     Cell, ColumnInfo, ColumnMeta, Connection, ConnectionConfig, DbError, DbKind, DbObject, DbResult, ForeignKeyInfo,
     IndexInfo, ObjectKind, ObjectPath, QueryResult, SslMode, StatementOutcome, TableDetails,
 };
-use futures_util::TryStreamExt;
 use tiberius::{AuthMethod, Client, ColumnData, ColumnType, Config, EncryptionLevel, FromSql, QueryItem, Row};
 use tokio::net::TcpStream;
 use tokio::sync::{Mutex, Notify};
@@ -145,9 +145,9 @@ fn type_name(t: ColumnType) -> &'static str {
 /// True for statements whose row count is worth reporting.
 fn is_dml(sql: &str) -> bool {
     let tokens = lasiusman_core::sql::tokenize(sql, DbKind::MsSql);
-    let first = tokens
-        .iter()
-        .find(|t| !matches!(t.kind, lasiusman_core::sql::TokenKind::Whitespace | lasiusman_core::sql::TokenKind::Comment));
+    let first = tokens.iter().find(|t| {
+        !matches!(t.kind, lasiusman_core::sql::TokenKind::Whitespace | lasiusman_core::sql::TokenKind::Comment)
+    });
     first.is_some_and(|t| {
         let w = sql[t.range.clone()].to_ascii_lowercase();
         matches!(w.as_str(), "insert" | "update" | "delete" | "merge")

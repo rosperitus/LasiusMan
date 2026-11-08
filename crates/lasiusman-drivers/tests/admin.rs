@@ -159,7 +159,13 @@ async fn postgres() {
         eprintln!("LASIUSMAN_TEST_POSTGRES not set, skipping");
         return;
     };
-    check(cfg, "secret", ("public", "lasiusman_admin_t"), "CREATE TABLE IF NOT EXISTS public.lasiusman_admin_t (id int)").await;
+    check(
+        cfg,
+        "secret",
+        ("public", "lasiusman_admin_t"),
+        "CREATE TABLE IF NOT EXISTS public.lasiusman_admin_t (id int)",
+    )
+    .await;
 }
 
 #[tokio::test]

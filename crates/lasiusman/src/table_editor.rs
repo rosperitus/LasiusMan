@@ -1,11 +1,11 @@
 //! Table editor: create a table or change an existing one through a form,
 //! with the generated DDL shown live before it runs.
 
+use egui::{RichText, Ui};
 use lasiusman_core::ddl::{self, ColumnDef, Plan, TableDef};
 use lasiusman_core::{
     ColumnInfo, ConnectionConfig, DbKind, DbObject, ForeignKeyInfo, IndexInfo, ObjectKind, ObjectPath, TableDetails,
 };
-use egui::{RichText, Ui};
 use shadcn_egui::{
     Alert, Button, ButtonSize, Checkbox, Input, Select, Theme, TooltipExt, dropdown_menu, label, menu_item, toast,
 };

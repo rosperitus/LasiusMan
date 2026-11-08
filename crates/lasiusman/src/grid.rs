@@ -5,11 +5,11 @@
 use std::collections::BTreeSet;
 use std::sync::Arc;
 
+use egui::{RichText, Ui};
 use lasiusman_core::export::{Format, export};
 use lasiusman_core::sql::Dialect;
 use lasiusman_core::value::Stats;
 use lasiusman_core::{Cell, DbKind, ObjectPath, QueryResult};
-use egui::{RichText, Ui};
 use shadcn_egui::{
     Button, ButtonSize, Column, DataTable, Theme, TooltipExt, dropdown_menu, menu_item, menu_label, menu_separator,
     toast,

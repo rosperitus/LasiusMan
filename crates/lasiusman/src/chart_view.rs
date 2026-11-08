@@ -1,9 +1,9 @@
 //! A chart of a query result: bars, lines or a pie, drawn with the painter,
 //! with a tooltip for the values under the pointer.
 
+use egui::{Align2, Color32, FontId, Pos2, Rect, RichText, Sense, Shape, Stroke, Ui, Vec2, pos2, vec2};
 use lasiusman_core::QueryResult;
 use lasiusman_core::chart::{self, ChartData, ChartKind, ChartSpec};
-use egui::{Align2, Color32, FontId, Pos2, Rect, RichText, Sense, Shape, Stroke, Ui, Vec2, pos2, vec2};
 use shadcn_egui::{Select, Theme, Toggle};
 
 use crate::i18n::{tr, trf};

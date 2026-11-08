@@ -56,8 +56,9 @@ async fn check(cfg: ConnectionConfig, db: &str, create: &str) {
     exec(&c, db, create).await;
     exec(&c, db, "INSERT INTO plan_t (id, v) VALUES (1, 'x'), (2, 'y')").await;
 
-    let plan =
-        lasiusman_drivers::explain(&c, Some(db), kind, product, "SELECT * FROM plan_t WHERE v = 'x'", false).await.unwrap();
+    let plan = lasiusman_drivers::explain(&c, Some(db), kind, product, "SELECT * FROM plan_t WHERE v = 'x'", false)
+        .await
+        .unwrap();
     assert!(mentions(&plan, "plan_t"), "{kind:?}: {plan:#?}");
     assert!(!plan.raw.is_empty());
     let sql = "SELECT a.id, b.v FROM plan_t a JOIN plan_t b ON a.id = b.id WHERE a.v = 'x';";
@@ -71,7 +72,9 @@ async fn check(cfg: ConnectionConfig, db: &str, create: &str) {
         assert_eq!(count(&c, db, "plan_t").await, "2", "{kind:?}");
     }
     // A failed plan leaves the session usable (SHOWPLAN is off again on SQL Server).
-    assert!(lasiusman_drivers::explain(&c, Some(db), kind, product, "SELECT * FROM no_such_table", false).await.is_err());
+    assert!(
+        lasiusman_drivers::explain(&c, Some(db), kind, product, "SELECT * FROM no_such_table", false).await.is_err()
+    );
     assert_eq!(count(&c, db, "plan_t").await, "2", "{kind:?}");
 
     if supports_analyze(kind) {

@@ -7,10 +7,10 @@
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
+use egui::{Color32, RichText, Ui};
 use lasiusman_core::compare::{self, DataDiff, DataSpec, ObjectDiff, Snapshot, Status};
 use lasiusman_core::ddl::Plan;
 use lasiusman_core::{Connection, ConnectionConfig, DbError, DbKind, DbResult, ObjectPath, TableDetails};
-use egui::{Color32, RichText, Ui};
 use shadcn_egui::{Button, ButtonSize, Checkbox, DiffView, Empty, Theme, TooltipExt, alert_dialog, tabs, toast};
 use tokio::sync::OnceCell;
 use uuid::Uuid;

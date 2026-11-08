@@ -470,7 +470,12 @@ async fn ms_moves(client: &mut crate::mssql::MsClient, database: &str, path: &st
 
 /// Runs a SQL Server backup or restore on the server. A second session
 /// reports `percent_complete` and, on cancel, ends the job with `KILL`.
-pub async fn mssql_run(cfg: lasiusman_core::ConnectionConfig, job: MsJob, report: Report, cancel: Cancel) -> DbResult<()> {
+pub async fn mssql_run(
+    cfg: lasiusman_core::ConnectionConfig,
+    job: MsJob,
+    report: Report,
+    cancel: Cancel,
+) -> DbResult<()> {
     let (cfg, _tunnel) = crate::ssh::route(&cfg).await?;
     use lasiusman_core::backup::{ms_backup, ms_restore};
     let mut client = crate::mssql::open_client(&cfg, Some("master")).await?;

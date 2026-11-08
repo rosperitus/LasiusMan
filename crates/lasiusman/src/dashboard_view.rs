@@ -5,10 +5,10 @@
 use std::collections::VecDeque;
 use std::time::{Duration, Instant};
 
+use egui::{RichText, Ui};
 use lasiusman_core::chart::{ChartKind, ChartSpec};
 use lasiusman_core::dashboard::{self, Sample};
 use lasiusman_core::{Cell, ColumnMeta, DbKind, DbResult, Product, QueryResult, StatementOutcome};
-use egui::{RichText, Ui};
 use shadcn_egui::{Column, DataTable, Select, Switch, Theme};
 
 use crate::chart_view;

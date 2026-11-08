@@ -15,5 +15,9 @@ fn main() -> eframe::Result {
             .with_min_inner_size([800.0, 500.0]),
         ..Default::default()
     };
-    eframe::run_native("LasiusMan", options, Box::new(move |cc| Ok(Box::new(lasiusman::app::LasiusManApp::new(cc, runtime)))))
+    eframe::run_native(
+        "LasiusMan",
+        options,
+        Box::new(move |cc| Ok(Box::new(lasiusman::app::LasiusManApp::new(cc, runtime)))),
+    )
 }

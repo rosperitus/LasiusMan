@@ -2,8 +2,8 @@
 
 use std::path::PathBuf;
 
-use lasiusman_core::{ConnColor, ConnectionConfig, DbKind, Product, SshAuth, SslMode};
 use egui::{Context, RichText, Ui};
+use lasiusman_core::{ConnColor, ConnectionConfig, DbKind, Product, SshAuth, SslMode};
 use shadcn_egui::{Alert, Button, Checkbox, Dialog, Input, Select, Theme, footer, label, tabs};
 
 use crate::explorer::Load;

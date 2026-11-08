@@ -7,10 +7,10 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 
+use egui::{RichText, Ui};
 use lasiusman_core::DbResult;
 use lasiusman_core::backup::{SqliteMethod, ToolCommand};
 use lasiusman_drivers::backup::{self as runner, Progress};
-use egui::{RichText, Ui};
 use shadcn_egui::{Button, ButtonSize, Theme, TooltipExt, toast, toast_error};
 
 use crate::events::{Event, JobEvent, JobId, Tasks};

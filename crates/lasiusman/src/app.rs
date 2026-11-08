@@ -3,8 +3,8 @@
 use crate::i18n::{self, Lang, tr, trf};
 use std::sync::mpsc::Receiver;
 
-use lasiusman_core::{ConnectionConfig, DbKind};
 use egui::{Key, Modifiers, RichText, Ui};
+use lasiusman_core::{ConnectionConfig, DbKind};
 use shadcn_egui::{Button, ButtonSize, Select, Switch, Theme, Toaster, TooltipExt, alert_dialog, toast, toast_error};
 use uuid::Uuid;
 

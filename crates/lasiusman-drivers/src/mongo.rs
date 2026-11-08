@@ -5,12 +5,12 @@
 use std::time::Duration;
 
 use async_trait::async_trait;
+use futures_util::TryStreamExt;
 use lasiusman_core::mongo::{self as m, Call, Reply, Shell};
 use lasiusman_core::{
     ColumnInfo, Connection, ConnectionConfig, DbError, DbKind, DbObject, DbResult, IndexInfo, ObjectKind, ObjectPath,
     SslMode, StatementOutcome, TableDetails,
 };
-use futures_util::TryStreamExt;
 use mongodb::bson::{Bson, Document, doc, oid::ObjectId};
 use mongodb::options::{ClientOptions, Credential, ServerAddress, Tls, TlsOptions};
 use mongodb::results::CollectionType;

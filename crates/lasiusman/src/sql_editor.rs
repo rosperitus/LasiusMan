@@ -5,12 +5,12 @@
 use std::ops::Range;
 use std::sync::Arc;
 
+use egui::text::{CCursor, CCursorRange, LayoutJob, LayoutSection, TextFormat};
+use egui::{Color32, FontId, Key, Modifiers, RichText, TextBuffer, Ui};
 use lasiusman_core::DbKind;
 use lasiusman_core::complete::{self, Catalog, Completion, ItemKind};
 use lasiusman_core::find::{self, Query};
 use lasiusman_core::sql::{TokenKind, tokenize};
-use egui::text::{CCursor, CCursorRange, LayoutJob, LayoutSection, TextFormat};
-use egui::{Color32, FontId, Key, Modifiers, RichText, TextBuffer, Ui};
 use shadcn_egui::{Button, ButtonSize, Input, Theme, Toggle};
 
 use crate::i18n::{tr, trf};

@@ -5,10 +5,10 @@
 
 use std::sync::Arc;
 
-use lasiusman_core::er::{self, Cardinality, Diagram, geometry};
-use lasiusman_core::{Connection, ConnectionConfig, DbKind, DbObject, DbResult, ObjectKind, ObjectPath, TableDetails};
 use egui::epaint::CubicBezierShape;
 use egui::{Align2, Color32, FontId, Pos2, Rect, Sense, Stroke, StrokeKind, Ui, Vec2, pos2, vec2};
+use lasiusman_core::er::{self, Cardinality, Diagram, geometry};
+use lasiusman_core::{Connection, ConnectionConfig, DbKind, DbObject, DbResult, ObjectKind, ObjectPath, TableDetails};
 use shadcn_egui::{
     Button, ButtonSize, Checkbox, Input, Theme, TooltipExt, dropdown_menu, menu_item, menu_label, menu_separator, toast,
 };

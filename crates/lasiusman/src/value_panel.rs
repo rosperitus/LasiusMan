@@ -5,10 +5,10 @@ use std::hash::{Hash, Hasher};
 
 use std::collections::HashSet;
 
+use egui::{Color32, RichText, Ui};
 use lasiusman_core::json_tree::{self, Path, Step};
 use lasiusman_core::value::{self, Shown};
 use lasiusman_core::{Cell, ColumnMeta};
-use egui::{Color32, RichText, Ui};
 use serde_json::Value;
 use shadcn_egui::{Badge, Button, ButtonSize, Input, Theme, TooltipExt, toast, toggle_group};
 

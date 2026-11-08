@@ -2,10 +2,10 @@
 //! and type and changeable, with a preview of the first rows. The rows are
 //! inserted by a background job.
 
+use egui::{Context, RichText, Ui};
 use lasiusman_core::generate::{self, ColumnPlan, Generator, Kind};
 use lasiusman_core::{Cell, ConnectionConfig, DbKind, ObjectPath, TableDetails};
 use lasiusman_drivers::generate::GenerateJob;
-use egui::{Context, RichText, Ui};
 use shadcn_egui::{Alert, Button, Checkbox, Dialog, Input, Select, Theme, footer, label};
 use uuid::Uuid;
 

@@ -1,9 +1,9 @@
 //! A pivot table of a console result: the columns to group rows by, spread
 //! across and aggregate, picked above the table.
 
+use egui::{RichText, Ui};
 use lasiusman_core::QueryResult;
 use lasiusman_core::pivot::{self, Agg, PivotSpec};
-use egui::{RichText, Ui};
 use shadcn_egui::{Column, DataTable, Select, Theme};
 
 use crate::i18n::{tr, trf};

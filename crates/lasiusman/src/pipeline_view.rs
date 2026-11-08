@@ -5,10 +5,10 @@
 
 use std::sync::Arc;
 
+use egui::{RichText, Ui};
 use lasiusman_core::aggregation::{self, Lang, STAGES, Stage};
 use lasiusman_core::mongo::{self, Call, Reply, Shell};
 use lasiusman_core::{Connection, DbKind, DbObject, DbResult};
-use egui::{RichText, Ui};
 use serde_json::Value;
 use shadcn_egui::{Alert, Button, ButtonSize, Dialog, Input, Select, Switch, Theme, footer, toast};
 

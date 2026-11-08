@@ -4,9 +4,9 @@
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
+use egui::{RichText, Ui};
 use lasiusman_core::search::{self, HitKind};
 use lasiusman_core::{Cell, ConnectionConfig, DbKind, DbObject, StatementOutcome};
-use egui::{RichText, Ui};
 use shadcn_egui::{Button, Checkbox, Column, DataTable, Input, Theme};
 
 use crate::events::{Event, EventSender, TabEvent, TabId};

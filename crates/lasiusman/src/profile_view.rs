@@ -1,9 +1,9 @@
 //! The profile of a table column in a dialog: counts, range, the most frequent
 //! values as bars and a histogram of numbers.
 
+use egui::{RichText, Sense, Ui};
 use lasiusman_core::chart::short_number;
 use lasiusman_core::profile::Profile;
-use egui::{RichText, Sense, Ui};
 use shadcn_egui::{Button, Dialog, Theme};
 
 use crate::explorer::Load;

@@ -4,10 +4,10 @@
 //! sorting set below. The SQL is shown as it changes and can be run here or
 //! opened in a console.
 
+use egui::{Align2, Color32, FontId, Pos2, Rect, RichText, Sense, Stroke, StrokeKind, Ui, Vec2, pos2, vec2};
 use lasiusman_core::pivot::Agg;
 use lasiusman_core::query_builder::{Filter, JoinKind, Op, Query, Sort};
 use lasiusman_core::{DbKind, ObjectKind, ObjectPath, QueryResult, StatementOutcome};
-use egui::{Align2, Color32, FontId, Pos2, Rect, RichText, Sense, Stroke, StrokeKind, Ui, Vec2, pos2, vec2};
 use shadcn_egui::{Button, ButtonSize, Checkbox, Column, DataTable, Input, Select, Theme, tabs, toast, toast_error};
 
 use crate::events::{Event, TabEvent, TabId};

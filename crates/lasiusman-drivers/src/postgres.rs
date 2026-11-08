@@ -8,12 +8,12 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use async_trait::async_trait;
+use futures_util::{TryStreamExt, pin_mut};
 use lasiusman_core::sql::Dialect;
 use lasiusman_core::{
     Cell, ColumnInfo, ColumnMeta, Connection, ConnectionConfig, DbError, DbKind, DbObject, DbResult, ForeignKeyInfo,
     IndexInfo, ObjectKind, ObjectPath, QueryResult, SslMode, StatementOutcome, TableDetails,
 };
-use futures_util::{TryStreamExt, pin_mut};
 use tokio::sync::Mutex;
 use tokio_postgres::{CancelToken, Client, SimpleQueryMessage};
 

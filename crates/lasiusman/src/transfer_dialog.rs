@@ -5,13 +5,13 @@
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::{Receiver, TryRecvError, channel};
 
+use egui::{Context, RichText, Ui};
 use lasiusman_core::export::Format;
 use lasiusman_core::import::{self, ColumnMap, CsvOptions, Field, ImportFormat};
 use lasiusman_core::sql::Dialect;
 use lasiusman_core::{ConnectionConfig, ObjectPath, TableDetails};
 use lasiusman_core::{copy, ddl, infer};
 use lasiusman_drivers::transfer::{ExportJob, ExportSource, ImportJob};
-use egui::{Context, RichText, Ui};
 use shadcn_egui::{Alert, Button, Checkbox, Dialog, Input, Select, Theme, footer, label};
 use uuid::Uuid;
 

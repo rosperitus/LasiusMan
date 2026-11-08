@@ -265,8 +265,10 @@ async fn mssql_round_trip() {
     }
     run("CREATE DATABASE lasiusman_bk".into()).await;
     run("CREATE TABLE lasiusman_bk.dbo.t (id int IDENTITY PRIMARY KEY, v nvarchar(20))".into()).await;
-    run("INSERT INTO lasiusman_bk.dbo.t (v) SELECT TOP 3000 N'row' FROM sys.all_objects a CROSS JOIN sys.all_objects b"
-        .into())
+    run(
+        "INSERT INTO lasiusman_bk.dbo.t (v) SELECT TOP 3000 N'row' FROM sys.all_objects a CROSS JOIN sys.all_objects b"
+            .into(),
+    )
     .await;
 
     // A relative path lands in the server's default backup folder.
@@ -293,7 +295,9 @@ async fn mssql_round_trip() {
     let options = lasiusman_core::backup::MsRestoreOptions { relocate: true, ..Default::default() };
     let copy = MsJob::Restore { database: "lasiusman_bk_copy".into(), options, path: file };
     mssql_run(cfg.clone(), copy, report, no_cancel()).await.unwrap();
-    assert!(seen.lock().unwrap().iter().any(|p| matches!(p, Progress::Log(l) if l.contains("lasiusman_bk_copy_log.ldf"))));
+    assert!(
+        seen.lock().unwrap().iter().any(|p| matches!(p, Progress::Log(l) if l.contains("lasiusman_bk_copy_log.ldf")))
+    );
     assert_eq!(count(&master, "master", "SELECT count(*) FROM lasiusman_bk_copy.dbo.t").await, "3000");
     assert_eq!(
         count(&master, "master", "SELECT CAST(DATABASEPROPERTYEX(N'lasiusman_bk_copy', 'UserAccess') AS nvarchar(20))")
@@ -363,9 +367,14 @@ async fn clickhouse_round_trip() {
         ..Default::default()
     };
     let (report, _) = collect();
-    let err =
-        clickhouse_run(cfg.clone(), ch_restore("lasiusman_chbk", Some("t"), &r, false), String::new(), report, no_cancel())
-            .await
-            .unwrap_err();
+    let err = clickhouse_run(
+        cfg.clone(),
+        ch_restore("lasiusman_chbk", Some("t"), &r, false),
+        String::new(),
+        report,
+        no_cancel(),
+    )
+    .await
+    .unwrap_err();
     assert!(err.message.contains("already"), "{}", err.message);
 }

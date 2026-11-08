@@ -27,7 +27,8 @@ fn from_url(kind: DbKind, var: &str) -> Option<ConnectionConfig> {
     cfg.user = user.into();
     cfg.password = password.into();
     cfg.database = db.into();
-    cfg.ssl_mode = if kind == DbKind::MsSql { lasiusman_core::SslMode::Prefer } else { lasiusman_core::SslMode::Disable };
+    cfg.ssl_mode =
+        if kind == DbKind::MsSql { lasiusman_core::SslMode::Prefer } else { lasiusman_core::SslMode::Disable };
     Some(cfg)
 }
 

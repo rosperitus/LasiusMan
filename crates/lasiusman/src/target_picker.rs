@@ -4,8 +4,8 @@
 
 use std::sync::Arc;
 
-use lasiusman_core::{Capabilities, Connection, ConnectionConfig, DbKind, DbResult};
 use egui::{RichText, Ui};
+use lasiusman_core::{Capabilities, Connection, ConnectionConfig, DbKind, DbResult};
 use shadcn_egui::{Select, Theme};
 use tokio::sync::OnceCell;
 use uuid::Uuid;
@@ -146,7 +146,8 @@ impl TargetPicker {
         self.databases = Load::Loading;
         let (session, generation, t) = (self.session.clone(), self.generation, tasks.clone());
         tasks.runtime().spawn(async move {
-            let r = async { session.get_or_try_init(|| lasiusman_drivers::connect(&cfg)).await?.databases().await }.await;
+            let r =
+                async { session.get_or_try_init(|| lasiusman_drivers::connect(&cfg)).await?.databases().await }.await;
             Self::send(&t, tab, PickerEvent::Databases(generation, r));
         });
     }
@@ -158,7 +159,8 @@ impl TargetPicker {
         self.schema = None;
         let (session, generation, t) = (self.session.clone(), self.generation, tasks.clone());
         tasks.runtime().spawn(async move {
-            let r = async { session.get_or_try_init(|| lasiusman_drivers::connect(&cfg)).await?.schemas(&db).await }.await;
+            let r =
+                async { session.get_or_try_init(|| lasiusman_drivers::connect(&cfg)).await?.schemas(&db).await }.await;
             Self::send(&t, tab, PickerEvent::Schemas(generation, r));
         });
     }

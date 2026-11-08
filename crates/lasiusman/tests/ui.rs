@@ -4,6 +4,8 @@
 //! `tests/snapshots/*.png` (needs a wgpu adapter; on a machine without a GPU
 //! install a software Vulkan driver such as `mesa-vulkan-drivers`).
 
+use egui::{Key, Modifiers};
+use egui_kittest::{Harness, kittest::Queryable as _};
 use lasiusman::app::LasiusManApp;
 use lasiusman::backup_dialog::Scope;
 use lasiusman::explorer::Action;
@@ -11,8 +13,6 @@ use lasiusman::jobs::JobState;
 use lasiusman::store::Settings;
 use lasiusman_core::{Cell, ConnColor, ConnectionConfig, DbKind, DbObject, ObjectKind, ObjectPath};
 use lasiusman_drivers::transfer::ExportSource;
-use egui::{Key, Modifiers};
-use egui_kittest::{Harness, kittest::Queryable as _};
 
 fn sample_db(dir: &std::path::Path) -> String {
     let path = dir.join("shop.db");
@@ -757,7 +757,9 @@ fn browse_sqlite_database() {
     settle(&mut h);
     let plan = h.state_mut().generate_dialog().expect("generator open").plan();
     let customer_id = plan.iter().find(|p| p.column == "customer_id").unwrap();
-    assert!(matches!(&customer_id.kind, lasiusman_core::generate::Kind::Reference { table, .. } if table == "customers"));
+    assert!(
+        matches!(&customer_id.kind, lasiusman_core::generate::Kind::Reference { table, .. } if table == "customers")
+    );
     h.state_mut().generate_dialog().unwrap().set_count(200);
     settle(&mut h);
     snapshot(&mut h, "generate_dialog");

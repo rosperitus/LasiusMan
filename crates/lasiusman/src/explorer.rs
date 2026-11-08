@@ -6,8 +6,8 @@
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 
-use lasiusman_core::{Connection, ConnectionConfig, DbKind, DbObject, ObjectKind, ObjectPath, Product, TableDetails};
 use egui::{Color32, RichText, Ui};
+use lasiusman_core::{Connection, ConnectionConfig, DbKind, DbObject, ObjectKind, ObjectPath, Product, TableDetails};
 use shadcn_egui::{Theme, Tree, TreeUi, menu_item, menu_separator};
 use uuid::Uuid;
 
@@ -445,7 +445,9 @@ fn connection(tree: &mut TreeUi<'_, Node>, c: &ConnState, actions: &mut Vec<Acti
             if menu_item(ui, tr("Refresh"), None).clicked() {
                 actions.push(Action::Refresh(id));
             }
-            if lasiusman_core::dashboard::supported(kind, c.cfg.product) && menu_item(ui, tr("Dashboard"), None).clicked() {
+            if lasiusman_core::dashboard::supported(kind, c.cfg.product)
+                && menu_item(ui, tr("Dashboard"), None).clicked()
+            {
                 actions.push(Action::OpenDashboard(id));
             }
             if lasiusman_core::sessions::supported(kind) && menu_item(ui, tr("Sessions"), None).clicked() {
