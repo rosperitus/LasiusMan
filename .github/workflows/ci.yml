@@ -83,7 +83,10 @@ jobs:
             docker info 2>/dev/null | grep -E 'Storage Driver|Cgroup|Kernel|Server Version|Total Memory'
           } >> "$diag"
           started=""
-          for image in public.ecr.aws/docker/library/mongo:8 mongo:8 mongo:7.0 bitnami/mongodb:8.0; do
+          # mongod 8.0 refuses to start on Linux kernels 6.19+ ("known
+          # incompatibility"); the hosted runners ship such a kernel, so the
+          # newest server lines are tried first.
+          for image in public.ecr.aws/docker/library/mongo:9.0 public.ecr.aws/docker/library/mongo:8.3 public.ecr.aws/docker/library/mongo:8.2 mongo:7.0; do
             echo "=== trying $image ===" | tee -a "$diag"
             docker rm -f mongo > /dev/null 2>&1 || true
             # Host networking: mongod opens its port on the runner itself,
