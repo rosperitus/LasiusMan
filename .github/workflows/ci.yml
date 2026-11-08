@@ -69,14 +69,41 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       # Started here rather than as a service: the service container failed to
       # initialize on hosted runners ("Failed to initialize container mongo:8"),
-      # and a step keeps its logs visible on failure.
+      # and a step keeps its error output and logs visible on failure.
       - name: Start MongoDB
         run: |
-          docker run -d --name mongo -p 27017:27017 public.ecr.aws/docker/library/mongo:8
+          summarize() {
+            {
+              echo '### MongoDB startup diagnostics'
+              echo '```'
+              echo '$ docker run --rm IMAGE mongod --version'
+              docker run --rm public.ecr.aws/docker/library/mongo:8 mongod --version 2>&1 | head -5
+              echo '$ docker version'
+              docker version 2>&1 | head -4
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          }
+          started=""
+          for image in public.ecr.aws/docker/library/mongo:8 mongo:8 mongo:7.0 bitnami/mongodb:8.0; do
+            echo "Trying $image"
+            docker rm -f mongo > /dev/null 2>&1 || true
+            if docker run -d --name mongo -p 27017:27017 "$image"; then
+              started="$image"
+              break
+            fi
+            echo "$image failed"
+          done
+          if [ -z "$started" ]; then
+            echo "Every mongo image failed to start" | tee -a "$GITHUB_STEP_SUMMARY"
+            summarize
+            exit 1
+          fi
+          echo "Started $started"
           for i in $(seq 60); do
             docker exec mongo mongosh --quiet --eval 'db.runCommand({ping: 1})' > /dev/null 2>&1 && exit 0
             sleep 1
           done
+          summarize
           docker logs mongo
           exit 1
       # Started here rather than as a service: it needs the backups disk config from the repository.
