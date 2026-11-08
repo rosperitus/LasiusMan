@@ -7,7 +7,7 @@
   <key>CFBundleDisplayName</key>
   <string>LasiusMan</string>
   <key>CFBundleIdentifier</key>
-  <string>io.github.georgebigscar-spec.lasiusman</string>
+  <string>io.github.rosperitus.lasiusman</string>
   <key>CFBundleExecutable</key>
   <string>lasiusman</string>
   <key>CFBundlePackageType</key>

@@ -7,9 +7,15 @@ default-members = ["crates/lasiusman"]
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/georgebigscar-spec/LasiusMan"
+repository = "https://github.com/rosperitus/LasiusMan"
 
 # The bundled DuckDB is a large C++ build: without debug info it builds
 # faster and takes gigabytes less disk.
 [profile.dev.package.libduckdb-sys]
 debug = false
+
+# Slower to build, but the binary is much faster and smaller.
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
