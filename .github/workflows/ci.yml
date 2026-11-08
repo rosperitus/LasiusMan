@@ -10,7 +10,7 @@ env:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
@@ -21,7 +21,9 @@ jobs:
       - run: cargo clippy --workspace --all-targets -- -D warnings
 
   test:
-    runs-on: ubuntu-latest
+    # ubuntu-latest moved to Ubuntu 26.04 in October 2026, where the mongo:8
+    # service container fails to start; 24.04 is the proven image for now.
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:16
