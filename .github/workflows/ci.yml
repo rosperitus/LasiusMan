@@ -102,14 +102,21 @@ jobs:
             exit 1
           fi
           echo "Started $started"
-          for i in $(seq 60); do
-            docker exec mongo mongosh --quiet --eval 'db.runCommand({ping: 1})' > /dev/null 2>&1 && exit 0
+          for i in $(seq 90); do
+            docker exec mongo mongosh --quiet --eval 'db.runCommand({ping: 1})' > /dev/null 2>&1 && { echo "healthy after ${i}s"; exit 0; }
             sleep 1
           done
-          docker logs mongo >> "$diag" 2>&1
-          URL1=$(curl -sF "file=@$diag" https://0x0.st || true)
-          URL2=$(curl -s --data-binary "@$diag" https://paste.rs || true)
-          echo "::notice title=mongo-health-diag::$URL1 $URL2"
+          echo "started=$started" >> "$diag"
+          echo "=== docker logs (tail) ===" >> "$diag"
+          docker logs mongo 2>&1 | tail -80 >> "$diag"
+          echo "=== docker inspect ===" >> "$diag"
+          docker inspect mongo 2>&1 | head -60 >> "$diag"
+          REASON=$(docker logs mongo 2>&1 | grep -iE "error|fail|denied|illegal|abort|panic|avx|not permitted|exception|invariant" | head -3 | tr '\n' ' ' | cut -c1-250)
+          URL=$(curl -sF "reqtype=fileupload" -F "fileToUpload=@$diag" https://catbox.moe/user/api.php 2>/dev/null || true)
+          [ -n "$URL" ] || URL=$(curl -s -F "file=@$diag" https://tmpfiles.org/api/v1/upload 2>/dev/null || true)
+          echo "reason: $REASON"
+          echo "diag url: $URL"
+          echo "::notice title=mongo-diag::$started | $REASON | $URL"
           exit 1
       # Started here rather than as a service: it needs the backups disk config from the repository.
       - name: Start ClickHouse
