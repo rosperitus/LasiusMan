@@ -86,7 +86,10 @@ jobs:
           for image in public.ecr.aws/docker/library/mongo:8 mongo:8 mongo:7.0 bitnami/mongodb:8.0; do
             echo "=== trying $image ===" | tee -a "$diag"
             docker rm -f mongo > /dev/null 2>&1 || true
-            if docker run -d --name mongo -p 27017:27017 "$image" 2>> "$diag"; then
+            # Host networking: mongod opens its port on the runner itself,
+            # with no docker-proxy and no exec in the health probe, the way
+            # every other database in this job is reached.
+            if docker run -d --name mongo --network host "$image" 2>> "$diag"; then
               started="$image"
               break
             fi
@@ -95,28 +98,28 @@ jobs:
           if [ -z "$started" ]; then
             echo "=== mongod --version probe ===" >> "$diag"
             docker run --rm public.ecr.aws/docker/library/mongo:8 mongod --version 2>&1 | head -8 >> "$diag"
-            URL1=$(curl -sF "file=@$diag" https://0x0.st || true)
-            URL2=$(curl -s --data-binary "@$diag" https://paste.rs || true)
-            echo "diagnostics: $URL1 $URL2"
-            echo "::notice title=mongo-startup-diag::$URL1 $URL2"
+            echo "Every mongo image failed to start" | tee -a "$diag"
+            echo "::notice title=mongo-diag::every image failed; see $diag"
             exit 1
           fi
           echo "Started $started"
           for i in $(seq 90); do
-            docker exec mongo mongosh --quiet --eval 'db.runCommand({ping: 1})' > /dev/null 2>&1 && { echo "healthy after ${i}s"; exit 0; }
+            if timeout 3 bash -c '</dev/tcp/127.0.0.1/27017' 2>/dev/null; then
+              echo "mongod port reachable after ${i}s"
+              exit 0
+            fi
             sleep 1
           done
           echo "started=$started" >> "$diag"
+          echo "=== tcp probe ===" >> "$diag"
+          timeout 3 bash -c '</dev/tcp/127.0.0.1/27017' 2>&1 | head -3 >> "$diag" || true
+          echo "=== docker ps ===" >> "$diag"
+          docker ps -a --filter name=mongo >> "$diag" 2>&1
           echo "=== docker logs (tail) ===" >> "$diag"
           docker logs mongo 2>&1 | tail -80 >> "$diag"
-          echo "=== docker inspect ===" >> "$diag"
-          docker inspect mongo 2>&1 | head -60 >> "$diag"
-          REASON=$(docker logs mongo 2>&1 | grep -iE "error|fail|denied|illegal|abort|panic|avx|not permitted|exception|invariant" | head -3 | tr '\n' ' ' | cut -c1-250)
-          URL=$(curl -sF "reqtype=fileupload" -F "fileToUpload=@$diag" https://catbox.moe/user/api.php 2>/dev/null || true)
-          [ -n "$URL" ] || URL=$(curl -s -F "file=@$diag" https://tmpfiles.org/api/v1/upload 2>/dev/null || true)
-          echo "reason: $REASON"
-          echo "diag url: $URL"
-          echo "::notice title=mongo-diag::$started | $REASON | $URL"
+          REASON=$(docker logs mongo 2>&1 | tail -15 | tr '\n' ' ' | cut -c1-240)
+          echo "last log lines: $REASON"
+          echo "::notice title=mongo-diag::$started | $REASON"
           exit 1
       # Started here rather than as a service: it needs the backups disk config from the repository.
       - name: Start ClickHouse
