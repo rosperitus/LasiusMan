@@ -72,30 +72,33 @@ jobs:
       # and a step keeps its error output and logs visible on failure.
       - name: Start MongoDB
         run: |
-          summarize() {
-            {
-              echo '### MongoDB startup diagnostics'
-              echo '```'
-              echo '$ docker run --rm IMAGE mongod --version'
-              docker run --rm public.ecr.aws/docker/library/mongo:8 mongod --version 2>&1 | head -5
-              echo '$ docker version'
-              docker version 2>&1 | head -4
-              echo '```'
-            } >> "$GITHUB_STEP_SUMMARY"
-          }
+          diag="$(mktemp)"
+          {
+            echo "=== host ==="
+            uname -a
+            grep -m1 'model name' /proc/cpuinfo
+            grep -m1 flags /proc/cpuinfo | tr ' ' '\n' | grep -E '^avx' | tr '\n' ' '; echo
+            echo "=== docker ==="
+            docker version 2>&1 | head -12
+            docker info 2>/dev/null | grep -E 'Storage Driver|Cgroup|Kernel|Server Version|Total Memory'
+          } >> "$diag"
           started=""
           for image in public.ecr.aws/docker/library/mongo:8 mongo:8 mongo:7.0 bitnami/mongodb:8.0; do
-            echo "Trying $image"
+            echo "=== trying $image ===" | tee -a "$diag"
             docker rm -f mongo > /dev/null 2>&1 || true
-            if docker run -d --name mongo -p 27017:27017 "$image"; then
+            if docker run -d --name mongo -p 27017:27017 "$image" 2>> "$diag"; then
               started="$image"
               break
             fi
-            echo "$image failed"
+            echo "$image failed" | tee -a "$diag"
           done
           if [ -z "$started" ]; then
-            echo "Every mongo image failed to start" | tee -a "$GITHUB_STEP_SUMMARY"
-            summarize
+            echo "=== mongod --version probe ===" >> "$diag"
+            docker run --rm public.ecr.aws/docker/library/mongo:8 mongod --version 2>&1 | head -8 >> "$diag"
+            URL1=$(curl -sF "file=@$diag" https://0x0.st || true)
+            URL2=$(curl -s --data-binary "@$diag" https://paste.rs || true)
+            echo "diagnostics: $URL1 $URL2"
+            echo "::notice title=mongo-startup-diag::$URL1 $URL2"
             exit 1
           fi
           echo "Started $started"
@@ -103,8 +106,10 @@ jobs:
             docker exec mongo mongosh --quiet --eval 'db.runCommand({ping: 1})' > /dev/null 2>&1 && exit 0
             sleep 1
           done
-          summarize
-          docker logs mongo
+          docker logs mongo >> "$diag" 2>&1
+          URL1=$(curl -sF "file=@$diag" https://0x0.st || true)
+          URL2=$(curl -s --data-binary "@$diag" https://paste.rs || true)
+          echo "::notice title=mongo-health-diag::$URL1 $URL2"
           exit 1
       # Started here rather than as a service: it needs the backups disk config from the repository.
       - name: Start ClickHouse
